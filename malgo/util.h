@@ -2,6 +2,8 @@
 #define MALGO_UTILCLASSES_H
 
 #include <cmath>
+#include <nos/print.h>
+#include <nos/trace.h>
 
 namespace malgo
 {
@@ -28,6 +30,22 @@ namespace malgo
 			auto& self = self_cast();
 			self._data = alloc.allocate(n);
 			self._size = n;
+		}
+
+		void invalidate() 
+		{
+			auto& self = self_cast();
+			alloc.deallocate(self._data, self._size);
+			self._data = nullptr;
+			self._size = 0;
+		}
+
+		void resize(int n) 
+		{
+			auto& self = self_cast();
+			if (self._size == n) return;
+			if (self._data) invalidate();
+			create(n);
 		}
 	};
 

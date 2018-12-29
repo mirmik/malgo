@@ -6,6 +6,8 @@
 
 #include <malgo/util.h>
 
+#include <nos/trace.h>
+
 namespace malgo
 {
 	template <class T, class A> class vector;
@@ -72,16 +74,29 @@ namespace malgo
 	template <class V>
 	struct vector_root : public const_vector_root<V>
 	{
+		using parent = const_vector_root<V>;
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
+
+		using parent::self_cast;
+		using parent::data;
+		using parent::size;
+		using parent::operator[];
+		using parent::begin;
+		using parent::end;
 		
-		V& 						self_cast() 				{ return *static_cast<V*>(this); }
-		type* 					data()						{ return self_cast().data(); }
-		type& 					operator[](int i) 			{ return self_cast()[i]; }
-		const type& 			operator[](int i) const 	{ return self_cast()[i]; }
-		iterator 				begin() 		{ return self_cast().begin(); };
-		iterator const 			end() 			{ return self_cast().end(); };
+		V& 					self_cast() 					{ return *static_cast<V*>(this); }
+
+		type* 				data()							{ return self_cast().data(); }
+		type& 				operator[](int i) 				{ return self_cast()[i]; }
+		const type& 		operator[](int i) const 		{ return self_cast()[i]; }
+		iterator 			begin() 						{ return self_cast().begin(); };
+		iterator const 		end() 							{ return self_cast().end(); };
+		void 				reset(int n, const type& val)	{ return self_cast().reset(n, val); }
+
+		V& 						operator = (const vector_root& u) 		{ return self_cast() = u; }
+		template<class U> V& 	operator = (const vector_root<U>& u) 	{ return self_cast() = u; }
 	};
 
 	template <class V>
@@ -92,8 +107,8 @@ namespace malgo
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
 
-		type* 					_data;
-		int 					_size;
+		type* 		_data = nullptr;
+		int 		_size = 0;
 		int 					size() const				{ return _size; }
 		type* 					data()						{ return _data; }
 		const type* 			data() const				{ return _data; }
@@ -117,8 +132,8 @@ namespace malgo
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
 
-		const type*				_data;
-		int 					_size;
+		const type*	_data = nullptr;
+		int 		_size = 0;
 		int 					size() const				{ return _size; }
 		const type* 			data() const				{ return _data; }
 		const type& 			operator[](int i) const 	{ return _data[i]; }
@@ -136,9 +151,9 @@ namespace malgo
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
-		type* 	_data;
-		int 	_size;
-		int 	_step;
+		type* 	_data = nullptr;
+		int 	_size = 0;
+		int 	_step = 0;
 		int 					size() const				{ return _size; }
 		type* 					data()						{ return _data; }
 		const type* 			data() const				{ return _data; }
@@ -161,9 +176,9 @@ namespace malgo
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
-		const type* 	_data;
-		int 			_size;
-		int 			_step;
+		const type* _data = nullptr;
+		int 		_size = 0;
+		int 		_step = 0;
 		int 					size() const				{ return _size; }
 		const type* 			data() const				{ return _data; }
 		const type& 			operator[](int i) const 	{ return _data[i*_step]; }
@@ -211,6 +226,12 @@ namespace malgo
 		vector(int size)								{ keeper::create(size); }
 		vector(const T* data, int size)					{ keeper::create(size); std::copy(data, data+size, parent::_data); }
 		vector(const std::initializer_list<T>& list)	{ keeper::create(list.size()); std::copy(list.begin(), list.end(), parent::_data); }
+		void reset(int size, const T& val)				{ keeper::invalidate(); keeper::create(size); for (auto& ref : *this) ref = val; }
+
+		vector& operator = (const vector& oth) 								{ if (&oth == this) return *this; keeper::resize(oth.size()); std::copy(oth.begin(), oth.end(), parent::_data); return *this; }
+		vector& operator = (vector&& oth) 									{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
+		template <class V> vector& operator = (const vector_root<V>& oth) 	{ if (&oth == this) return *this; keeper::resize(oth.size()); std::copy(oth.begin(), oth.end(), parent::_data); return *this; }
+		template <class V> vector& operator = (vector_root<V>&& oth) 		{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
 	};
 
 	template<class V, class W> int compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	

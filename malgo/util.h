@@ -5,9 +5,15 @@
 
 namespace malgo
 {
+	template <typename A> constexpr A max(A a, A b) { return a > b ? a : b; } 
+	template <typename A> constexpr A min(A a, A b) { return a < b ? a : b; }
+	template <typename A> constexpr void swap(A& a, A& b) { A tmp = a; a = b; b = tmp; }  
+	template <typename A> constexpr A abs(A a) { return a >= 0 ? a : -a; }
+
 	template <class A> struct traits;
 	template <class A> using type_t = typename traits<A>::type;
 	template <class A> using alloc_t = typename traits<A>::alloc;
+	template <class A> using matrix_t = typename traits<A>::matrix;
 
 	template <class V>
 	struct vector_keeper

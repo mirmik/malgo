@@ -11,30 +11,48 @@ namespace malgo
 	template <class T, class A> class vector;
 	template <class T, class A> class vecview;
 	template <class T, class A> class const_vecview;
+	template <class T, class A> class uncompact_vecview;
+	template <class T, class A> class const_uncompact_vecview;
 
-    template <class T, class A> struct traits<vector<T,A>> { 
-            using type = T;
-            using alloc = A;
-            using iterator = T*; 
-            using const_iterator = const T*; 
-            using vector = malgo::vector<T,A>;
-    };
+	template <class T, class A> struct traits<vector<T,A>> { 
+			using type = T;
+			using alloc = A;
+			using iterator = T*; 
+			using const_iterator = const T*; 
+			using vector = malgo::vector<T,A>;
+	};
 
-    template <class T, class A> struct traits<vecview<T,A>> { 
-            using type = T;
-            using alloc = A;
-            using iterator = T*; 
-            using const_iterator = const T*; 
-            using vector = malgo::vector<T,A>;
-    };
+	template <class T, class A> struct traits<vecview<T,A>> { 
+			using type = T;
+			using alloc = A;
+			using iterator = T*; 
+			using const_iterator = const T*; 
+			using vector = malgo::vector<T,A>;
+	};
 
 	template <class T, class A> struct traits<const_vecview<T,A>> { 
-            using type = T;
-            using alloc = A;
-            using iterator = T*; 
-            using const_iterator = const T*; 
-            using vector = malgo::vector<T,A>;
-    };
+			using type = T;
+			using alloc = A;
+			using iterator = T*; 
+			using const_iterator = const T*; 
+			using vector = malgo::vector<T,A>;
+	};
+	
+	template <class T, class A> struct traits<uncompact_vecview<T,A>> { 
+			using type = T;
+			using alloc = A;
+			using iterator = T*; 
+			using const_iterator = const T*; 
+			using vector = malgo::vector<T,A>;
+	};
+
+	template <class T, class A> struct traits<const_uncompact_vecview<T,A>> { 
+			using type = T;
+			using alloc = A;
+			using iterator = T*; 
+			using const_iterator = const T*; 
+			using vector = malgo::vector<T,A>;
+	};
 
 	template <class V>
 	struct vector_root
@@ -80,7 +98,7 @@ namespace malgo
 
 		compact_vector() 												{}
 		compact_vector(type* data, int size) : _data(data), _size(size)	{}
- 	};
+	};
 
 	template <class V>
 	struct const_compact_vector : public vector_root<V>
@@ -95,22 +113,56 @@ namespace malgo
 		int 					size() const				{ return _size; }
 		const type* 			data() const				{ return _data; }
 		const type& 			operator[](int i) const 	{ return _data[i]; }
-
 		const_iterator 			begin() const 				{ return _data; }
 		const const_iterator 	end() const 				{ return _data + _size; }
 
 		const_compact_vector() 												{}
 		const_compact_vector(const type* data, int size) : _data(data), _size(size)	{}
- 	};
+	};
 
 	template <class V>
 	struct uncompact_vector : public vector_root<V>
 	{
 		using parent = vector_root<V>;
 		using type = typename traits<V>::type;
+		using iterator = typename traits<V>::iterator;
+		using const_iterator = typename traits<V>::const_iterator;
 		type* 	_data;
 		int 	_size;
 		int 	_step;
+		int 					size() const				{ return _size; }
+		type* 					data()						{ return _data; }
+		const type* 			data() const				{ return _data; }
+		type& 					operator[](int i) 			{ return _data[i*_step]; }
+		const type& 			operator[](int i) const 	{ return _data[i*_step]; }
+
+		iterator 				begin() 					{ return {_data, _step}; }
+		const_iterator 			begin() const 				{ return {_data, _step}; }
+		const iterator 			end() 						{ return {_data + _size, _step}; }
+		const const_iterator 	end() const 				{ return {_data + _size, _step}; }
+	
+		uncompact_vector() 																			{}
+		uncompact_vector(type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
+	};
+
+	template <class V>
+	struct const_uncompact_vector : public vector_root<V>
+	{
+		using parent = vector_root<V>;
+		using type = typename traits<V>::type;
+		using iterator = typename traits<V>::iterator;
+		using const_iterator = typename traits<V>::const_iterator;
+		const type* 	_data;
+		int 			_size;
+		int 			_step;
+		int 					size() const				{ return _size; }
+		const type* 			data() const				{ return _data; }
+		const type& 			operator[](int i) const 	{ return _data[i*_step]; }
+		const_iterator 			begin() const 				{ return {_data, _step}; }
+		const const_iterator 	end() const 				{ return {_data + _size, _step}; }
+	
+		const_uncompact_vector() 																			{}
+		const_uncompact_vector(const type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
 	};
 
 	template <class T, class A = std::allocator<T>>
@@ -130,7 +182,15 @@ namespace malgo
 	template <class T, class A = std::allocator<T>>
 	struct uncompact_vecview : public uncompact_vector<uncompact_vecview<T, A>>
 	{
-		using parent = compact_vector<uncompact_vecview<T, A>>;
+		using parent = uncompact_vector<uncompact_vecview<T, A>>;
+		uncompact_vecview(T* data, int size, int step) : parent(data, size, step) {}
+	};
+
+	template <class T, class A = std::allocator<T>>
+	struct const_uncompact_vecview : public const_uncompact_vector<const_uncompact_vecview<T, A>>
+	{
+		using parent = const_uncompact_vector<const_uncompact_vecview<T, A>>;
+		const_uncompact_vecview(const T* data, int size, int step) : parent(data, size, step) {}
 	};
 
 	template <class T, class A = std::allocator<T>>
@@ -146,12 +206,12 @@ namespace malgo
 
 	template<class V, class W> int compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
 
-    template<class A, class B> auto operator == (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
-    template<class A, class B> auto operator != (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) != 0) { return compare(a,b) != 0; }
-    template<class A, class B> auto operator <  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <  0) { return compare(a,b) <  0; }
-    template<class A, class B> auto operator >  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >  0) { return compare(a,b) >  0; }
-    template<class A, class B> auto operator <= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <= 0) { return compare(a,b) <= 0; }
-    template<class A, class B> auto operator >= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >= 0) { return compare(a,b) >= 0; }
+	template<class A, class B> auto operator == (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
+	template<class A, class B> auto operator != (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) != 0) { return compare(a,b) != 0; }
+	template<class A, class B> auto operator <  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <  0) { return compare(a,b) <  0; }
+	template<class A, class B> auto operator >  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >  0) { return compare(a,b) >  0; }
+	template<class A, class B> auto operator <= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <= 0) { return compare(a,b) <= 0; }
+	template<class A, class B> auto operator >= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >= 0) { return compare(a,b) >= 0; }
 
 	template<class V, class W, class F> typename V::vector elementwise_do(const vector_root<V>& a, const vector_root<W>& b, F&& f) { typename V::vector res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b[i]); return res; }
 	template<class V, class A, class F> A fold(F f, A a, const vector_root<V> & b) { for (const auto& r : b) { a = f(a, r); } return a; }

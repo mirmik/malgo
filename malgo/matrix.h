@@ -60,12 +60,33 @@ namespace malgo
 	};
 
 	template <class T, class A> class matrix;
+	template <class T, class A> class matrix_view;
+	template <class T, class A> class const_matrix_view;
 
 	template <class T, class A> struct traits<matrix<T, A>>
 	{
 		using type 					= T;
 		using alloc 				= A;
 		using matrix 				= malgo::matrix<T,A>;
+		using matrix_view 			= malgo::matrix_view<T,A>;
+		using const_matrix_view 	= malgo::const_matrix_view<T,A>;
+		using vector 				= malgo::vector<T,A>;
+		using iterator 				= T*;
+		using const_iterator 		= const T*;
+		using iterator1 			= matrix_iterator1<matrix>;
+		using const_iterator1 		= const_matrix_iterator1<matrix>;
+		using iterator2 			= matrix_iterator2<matrix>;
+		using const_iterator2 		= const_matrix_iterator2<matrix>;
+	};
+
+	template <class T, class A> struct traits<matrix_view<T, A>>
+	{
+		using type 					= T;
+		using alloc 				= A;
+		using matrix 				= malgo::matrix<T,A>;
+		using matrix_view 			= malgo::matrix_view<T,A>;
+		using const_matrix_view 	= malgo::const_matrix_view<T,A>;
+		using vector 				= malgo::vector<T,A>;
 		using iterator 				= T*;
 		using const_iterator 		= const T*;
 		using iterator1 			= matrix_iterator1<matrix>;
@@ -75,36 +96,58 @@ namespace malgo
 	};
 
 	template <class M>
-	struct matrix_root
+	struct const_matrix_root
 	{
 		using 						type = 		typename traits<M>::type;
 		using 						alloc = 	typename traits<M>::alloc;
 
+		const M& 					self_cast() const 				{ return *static_cast<const M*>(this); }
+		int 						size() const 					{ return self_cast().size(); }
+		int 						size1() const 					{ return self_cast().size1(); }
+		int 						size2() const 					{ return self_cast().size2(); }
+		const type* 				data() const					{ return self_cast().data(); }
+		const vecview<type, alloc> 	operator[](int i) const 		{ return self_cast()[i]; }
+		const type&			 		operator()(int i, int j) const 	{ return self_cast()(i, j); }
+		
+		typename traits<M>::const_iterator 			begin() const 	{ return self_cast().begin(); };
+		typename traits<M>::const_iterator const 	end() const 	{ return self_cast().end(); };
+		typename traits<M>::const_iterator1 		begin1() const 	{ return self_cast().begin1(); };
+		typename traits<M>::const_iterator1 const 	end1() const 	{ return self_cast().end1(); };
+		typename traits<M>::const_iterator2 		begin2() const 	{ return self_cast().begin2(); };
+		typename traits<M>::const_iterator2 const 	end2() const 	{ return self_cast().end2(); };
+	};
+
+	template <class M>
+	struct matrix_root : public const_matrix_root<M>
+	{
+		using 						parent = 	const_matrix_root<M>;
+		using 						type = 		typename traits<M>::type;
+		using 						alloc = 	typename traits<M>::alloc;
+
 		M& 							self_cast() 				{ return *static_cast<M*>(this); }
-		const M& 					self_cast() const 			{ return *static_cast<const M*>(this); }
-		int 						size() const 				{ return self_cast().size(); }
-		int 						size1() const 				{ return self_cast().size1(); }
-		int 						size2() const 				{ return self_cast().size2(); }
 		type* 						data()						{ return self_cast().data(); }
-		const type* 				data() const				{ return self_cast().data(); }
 		vecview<type, alloc> 		operator[](int i) 			{ return self_cast()[i]; }
-		const vecview<type, alloc> 	operator[](int i) const 	{ return self_cast()[i]; }
 		type&				 		operator()(int i, int j) 	{ return self_cast()(i, j); }
 
 		typename traits<M>::iterator 				begin() 		{ return self_cast().begin(); };
-		typename traits<M>::const_iterator 			begin() const 	{ return self_cast().begin(); };
 		typename traits<M>::iterator const 			end() 			{ return self_cast().end(); };
-		typename traits<M>::const_iterator const 	end() const 	{ return self_cast().end(); };
-
 		typename traits<M>::iterator1 				begin1() 		{ return self_cast().begin1(); };
-		typename traits<M>::const_iterator1 		begin1() const 	{ return self_cast().begin1(); };
 		typename traits<M>::iterator1 const 		end1() 			{ return self_cast().end1(); };
-		typename traits<M>::const_iterator1 const 	end1() const 	{ return self_cast().end1(); };
-
 		typename traits<M>::iterator2 				begin2() 		{ return self_cast().begin2(); };
-		typename traits<M>::const_iterator2 		begin2() const 	{ return self_cast().begin2(); };
 		typename traits<M>::iterator2 const 		end2() 			{ return self_cast().end2(); };
-		typename traits<M>::const_iterator2 const 	end2() const 	{ return self_cast().end2(); };
+
+		using parent::operator[];
+		using parent::operator();
+
+		using parent::data;
+		using parent::size;
+
+		using parent::begin;
+		using parent::begin1;
+		using parent::begin2;
+		using parent::end;
+		using parent::end1;
+		using parent::end2;
 	};
 
 	template <class M>

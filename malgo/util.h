@@ -13,6 +13,7 @@ namespace malgo
 	template <class A> struct traits;
 	template <class A> using type_t = typename traits<A>::type;
 	template <class A> using alloc_t = typename traits<A>::alloc;
+	template <class A> using vector_t = typename traits<A>::vector;
 	template <class A> using matrix_t = typename traits<A>::matrix;
 
 	template <class V>

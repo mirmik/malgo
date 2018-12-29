@@ -55,24 +55,33 @@ namespace malgo
 	};
 
 	template <class V>
-	struct vector_root
+	struct const_vector_root
 	{
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
 		
-		V& 					self_cast() 				{ return *static_cast<V*>(this); }
-		const V& 			self_cast() const 			{ return *static_cast<const V*>(this); }
-		int 				size() const 				{ return self_cast().size(); }
-		type* 					data()						{ return self_cast().data(); }
+		const V& 				self_cast() const 			{ return *static_cast<const V*>(this); }
+		int 					size() const 				{ return self_cast().size(); }
 		const type* 			data() const				{ return self_cast().data(); }
+		const type& 			operator[](int i) const 	{ return self_cast()[i]; }
+		const_iterator 			begin() const 				{ return self_cast().begin(); };
+		const_iterator const 	end() const 				{ return self_cast().end(); };
+	};
+
+	template <class V>
+	struct vector_root : public const_vector_root<V>
+	{
+		using type = typename traits<V>::type;
+		using iterator = typename traits<V>::iterator;
+		using const_iterator = typename traits<V>::const_iterator;
+		
+		V& 						self_cast() 				{ return *static_cast<V*>(this); }
+		type* 					data()						{ return self_cast().data(); }
 		type& 					operator[](int i) 			{ return self_cast()[i]; }
 		const type& 			operator[](int i) const 	{ return self_cast()[i]; }
-
 		iterator 				begin() 		{ return self_cast().begin(); };
-		const_iterator 		begin() const 	{ return self_cast().begin(); };
-		iterator 		const 	end() 			{ return self_cast().end(); };
-		const_iterator const 	end() const 	{ return self_cast().end(); };
+		iterator const 			end() 			{ return self_cast().end(); };
 	};
 
 	template <class V>

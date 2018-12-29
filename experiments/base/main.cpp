@@ -3,6 +3,7 @@
 #include <malgo/basealgo.h>
 
 #include <malgo/gaussj.h>
+#include <malgo/svd.h>
 
 #include <nos/print.h>
 

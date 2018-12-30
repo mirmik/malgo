@@ -57,12 +57,7 @@ namespace malgo
 	};
 
 	template <class V>
-	struct const_vector_root
-	{
-	};
-
-	template <class V>
-	struct vector_root : public const_vector_root<V>
+	struct vector_root
 	{
 		using parent = const_vector_root<V>;
 		using type = typename traits<V>::type;

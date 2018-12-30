@@ -100,7 +100,7 @@ namespace malgo
 	};
 
 	template <class V>
-	struct compact_vector : public vector_root<V>
+	struct compact_vector_root : public vector_root<V>
 	{
 		using parent = vector_root<V>;
 		using type = typename traits<V>::type;
@@ -120,32 +120,12 @@ namespace malgo
 		const iterator 			end() 						{ return _data + _size; }
 		const const_iterator 	end() const 				{ return _data + _size; }
 
-		compact_vector() 												{}
-		compact_vector(type* data, int size) : _data(data), _size(size)	{}
+		compact_vector_root() 													{}
+		compact_vector_root(type* data, int size) : _data(data), _size(size)	{}
 	};
 
 	template <class V>
-	struct const_compact_vector : public vector_root<V>
-	{
-		using parent = vector_root<V>;
-		using type = typename traits<V>::type;
-		using iterator = typename traits<V>::iterator;
-		using const_iterator = typename traits<V>::const_iterator;
-
-		const type*	_data = nullptr;
-		int 		_size = 0;
-		int 					size() const				{ return _size; }
-		const type* 			data() const				{ return _data; }
-		const type& 			operator[](int i) const 	{ return _data[i]; }
-		const_iterator 			begin() const 				{ return _data; }
-		const const_iterator 	end() const 				{ return _data + _size; }
-
-		const_compact_vector() 												{}
-		const_compact_vector(const type* data, int size) : _data(data), _size(size)	{}
-	};
-
-	template <class V>
-	struct uncompact_vector : public vector_root<V>
+	struct uncompact_vector_root : public vector_root<V>
 	{
 		using parent = vector_root<V>;
 		using type = typename traits<V>::type;
@@ -165,62 +145,28 @@ namespace malgo
 		const iterator 			end() 						{ return {_data + _size, _step}; }
 		const const_iterator 	end() const 				{ return {_data + _size, _step}; }
 	
-		uncompact_vector() 																			{}
-		uncompact_vector(type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
-	};
-
-	template <class V>
-	struct const_uncompact_vector : public vector_root<V>
-	{
-		using parent = vector_root<V>;
-		using type = typename traits<V>::type;
-		using iterator = typename traits<V>::iterator;
-		using const_iterator = typename traits<V>::const_iterator;
-		const type* _data = nullptr;
-		int 		_size = 0;
-		int 		_step = 0;
-		int 					size() const				{ return _size; }
-		const type* 			data() const				{ return _data; }
-		const type& 			operator[](int i) const 	{ return _data[i*_step]; }
-		const_iterator 			begin() const 				{ return {_data, _step}; }
-		const const_iterator 	end() const 				{ return {_data + _size, _step}; }
-	
-		const_uncompact_vector() 																			{}
-		const_uncompact_vector(const type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
+		uncompact_vector_root() 																		{}
+		uncompact_vector_root(type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
 	};
 
 	template <class T, class A = std::allocator<T>>
-	struct vecview : public compact_vector<vecview<T, A>>
+	struct vecview : public compact_vector_root<vecview<T, A>>
 	{
-		using parent = compact_vector<vecview<T, A>>;
+		using parent = compact_vector_root<vecview<T, A>>;
 		vecview(T* data, int size) : parent(data, size) {}
 	};
 
 	template <class T, class A = std::allocator<T>>
-	struct const_vecview : public const_compact_vector<const_vecview<T, A>>
+	struct uncompact_vecview : public uncompact_vector_root<uncompact_vecview<T, A>>
 	{
-		using parent = const_compact_vector<const_vecview<T, A>>;
-		const_vecview(const T* data, int size) : parent(data, size) {}
-	};
-
-	template <class T, class A = std::allocator<T>>
-	struct uncompact_vecview : public uncompact_vector<uncompact_vecview<T, A>>
-	{
-		using parent = uncompact_vector<uncompact_vecview<T, A>>;
+		using parent = uncompact_vector_root<uncompact_vecview<T, A>>;
 		uncompact_vecview(T* data, int size, int step) : parent(data, size, step) {}
 	};
 
 	template <class T, class A = std::allocator<T>>
-	struct const_uncompact_vecview : public const_uncompact_vector<const_uncompact_vecview<T, A>>
+	struct vector : public compact_vector_root<vector<T, A>>, public vector_keeper<vector<T, A>>
 	{
-		using parent = const_uncompact_vector<const_uncompact_vecview<T, A>>;
-		const_uncompact_vecview(const T* data, int size, int step) : parent(data, size, step) {}
-	};
-
-	template <class T, class A = std::allocator<T>>
-	struct vector : public compact_vector<vector<T, A>>, public vector_keeper<vector<T, A>>
-	{
-		using parent = compact_vector<vector<T, A>>;
+		using parent = compact_vector_root<vector<T, A>>;
 		using keeper = vector_keeper<vector<T, A>>;
 		vector()										{};
 		vector(int size)								{ keeper::create(size); }

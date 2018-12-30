@@ -7,6 +7,8 @@
 
 namespace malgo
 {
+	template<class F, class... T> using ret_t = decltype(std::declval<F>()(std::declval<T>()...));
+
 	template <typename A> constexpr A max(A a, A b) { return a > b ? a : b; } 
 	template <typename A> constexpr A min(A a, A b) { return a < b ? a : b; }
 	template <typename A> constexpr void swap(A& a, A& b) { A tmp = a; a = b; b = tmp; }  

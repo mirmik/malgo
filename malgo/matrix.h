@@ -9,8 +9,6 @@
 
 namespace malgo
 {
-	//template <class T, class A> struct compact_const_iterator;
-
 	template <class M> struct matrix_iterator1;
 	template <class M> struct matrix_iterator2;
 	template <class M> struct const_matrix_iterator1;
@@ -96,38 +94,25 @@ namespace malgo
 	};
 
 	template <class M>
-	struct const_matrix_root
+	struct matrix_root
 	{
 		using 						type = 		typename traits<M>::type;
 		using 						alloc = 	typename traits<M>::alloc;
 
+		M& 							self_cast() 					{ return *static_cast<M*>(this); }
 		const M& 					self_cast() const 				{ return *static_cast<const M*>(this); }
+		type& 						elem(int i)						{ return self_cast().elem(i); }
+		const type& 				elem(int i) const				{ return self_cast().elem(i); }
 		int 						size() const 					{ return self_cast().size(); }
 		int 						size1() const 					{ return self_cast().size1(); }
 		int 						size2() const 					{ return self_cast().size2(); }
+		type* 						data()							{ return self_cast().data(); }
 		const type* 				data() const					{ return self_cast().data(); }
+		vecview<type, alloc> 		operator[](int i) 				{ return self_cast()[i]; }
 		const vecview<type, alloc> 	operator[](int i) const 		{ return self_cast()[i]; }
+		type&				 		operator()(int i, int j) 		{ return self_cast()(i, j); }
 		const type&			 		operator()(int i, int j) const 	{ return self_cast()(i, j); }
-		
-		typename traits<M>::const_iterator 			begin() const 	{ return self_cast().begin(); };
-		typename traits<M>::const_iterator const 	end() const 	{ return self_cast().end(); };
-		typename traits<M>::const_iterator1 		begin1() const 	{ return self_cast().begin1(); };
-		typename traits<M>::const_iterator1 const 	end1() const 	{ return self_cast().end1(); };
-		typename traits<M>::const_iterator2 		begin2() const 	{ return self_cast().begin2(); };
-		typename traits<M>::const_iterator2 const 	end2() const 	{ return self_cast().end2(); };
-	};
 
-	template <class M>
-	struct matrix_root : public const_matrix_root<M>
-	{
-		using 						parent = 	const_matrix_root<M>;
-		using 						type = 		typename traits<M>::type;
-		using 						alloc = 	typename traits<M>::alloc;
-
-		M& 							self_cast() 				{ return *static_cast<M*>(this); }
-		type* 						data()						{ return self_cast().data(); }
-		vecview<type, alloc> 		operator[](int i) 			{ return self_cast()[i]; }
-		type&				 		operator()(int i, int j) 	{ return self_cast()(i, j); }
 
 		typename traits<M>::iterator 				begin() 		{ return self_cast().begin(); };
 		typename traits<M>::iterator const 			end() 			{ return self_cast().end(); };
@@ -135,19 +120,6 @@ namespace malgo
 		typename traits<M>::iterator1 const 		end1() 			{ return self_cast().end1(); };
 		typename traits<M>::iterator2 				begin2() 		{ return self_cast().begin2(); };
 		typename traits<M>::iterator2 const 		end2() 			{ return self_cast().end2(); };
-
-		using parent::operator[];
-		using parent::operator();
-
-		using parent::data;
-		using parent::size;
-
-		using parent::begin;
-		using parent::begin1;
-		using parent::begin2;
-		using parent::end;
-		using parent::end1;
-		using parent::end2;
 	};
 
 	template <class M>
@@ -164,9 +136,11 @@ namespace malgo
 		int 							size2() const				{ return _size2; }
 		type*							data()						{ return _data; }
 		const type* 					data() const				{ return _data; }
-		vecview<type, alloc>	 		operator[](int i) 			{ return { _data + i * _size2, _size2}; }
+		type&							elem(int i)					{ return _data[i]; }
+		const type&						elem(int i)	const			{ return _data[i]; }
+		vecview<type, alloc>	 		operator[](int i) 			{ return { _data + i * _size2, _size2 }; }
 		const vecview<type, alloc>		operator[](int i) const 	{ return { _data + i * _size2, _size2 }; }
-		type&							operator()(int i, int j)	{ return *(_data + _size2 * i + j); }
+		type&							operator()(int i, int j)	{ return _data[i * _size2 + j]; }
 
 		type* 								begin() 		{ return _data; }
 		const type* 						begin() const 	{ return _data; }
@@ -202,9 +176,11 @@ namespace malgo
 		template <class W> matrix_view(matrix_root<W>& mat) : parent(mat.data(), mat.size1(), mat.size2()) {};
 	};
 
-	template <class A, class B> bool compare(const matrix_root<A>& a, const matrix_root<B>& b) 	{ if (a.size() != b.size()) return a.size() - b.size(); auto ait = a.begin(); auto bit = b.begin(); auto aend = a.end(); while (ait != aend) { auto r = *ait++ - *bit++; if (r != 0) return r; } return 0; }
-
+	template<class F, class A, class B> using mxm_apply_t = matrix<ret_t<F, type_t<A>, type_t<B>>>;
+	template<class F, class A, class B> mxm_apply_t<F,A,B> elementwise(F&& f, const matrix_root<A>& a, const matrix_root<B>& b) { mxm_apply_t<F,A,B> res(a.size1(), b.size2()); for (int i = 0; i < a.size(); ++i) res.elem(i) = f(a.elem(i), b.elem(i)); return res; }
+	
 	//Lexicographic compare
+	template<class A, class B> int compare(const matrix_root<A>& a, const matrix_root<B>& b) 	{ if (a.size() != b.size()) return a.size() - b.size(); auto ait = a.begin(); auto bit = b.begin(); auto aend = a.end(); while (ait != aend) { auto r = *ait++ - *bit++; if (r != 0) return r; } return 0; }
 	template<class A, class B> bool operator == (const matrix_root<A>& a, const matrix_root<B>& b) { return compare(a, b) == 0; }
 	template<class A, class B> bool operator != (const matrix_root<A>& a, const matrix_root<B>& b) { return compare(a, b) != 0; }
 	template<class A, class B> bool operator <  (const matrix_root<A>& a, const matrix_root<B>& b) { return compare(a, b) <  0; }
@@ -212,10 +188,16 @@ namespace malgo
 	template<class A, class B> bool operator <= (const matrix_root<A>& a, const matrix_root<B>& b) { return compare(a, b) <= 0; }
 	template<class A, class B> bool operator >= (const matrix_root<A>& a, const matrix_root<B>& b) { return compare(a, b) >= 0; }
 
+	//Algebraic
+	template<class A, class B> mxm_apply_t<detail::op_add,A,B> operator + (const matrix_root<A>& a, const matrix_root<B>& b) { return elementwise(detail::op_add{}, a, b); }
+	template<class A, class B> mxm_apply_t<detail::op_sub,A,B> operator - (const matrix_root<A>& a, const matrix_root<B>& b) { return elementwise(detail::op_sub{}, a, b); }
+	template<class A, class B> mxm_apply_t<detail::op_mul,A,B> operator * (const matrix_root<A>& a, const matrix_root<B>& b) { return elementwise(detail::op_mul{}, a, b); }
+	template<class A, class B> mxm_apply_t<detail::op_div,A,B> operator / (const matrix_root<A>& a, const matrix_root<B>& b) { return elementwise(detail::op_div{}, a, b); }
+
 	//Basealgo
-	template <class M> matrix_t<M> transpose(const compact_matrix<M>& a) 	{ matrix_t<M> res(a.size2(), a.size1()); malgo::raw::transpose(a.data(), a.size1(), a.size2(), res.data()); return res; } 
-	template <class M> matrix_t<M> inverse(const compact_matrix<M>& a) 		{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_inverse(a.data(), a.size1(), res.data()); return res; } 
-	template <class M> matrix_t<M> exponent(const compact_matrix<M>& a) 	{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_exponent(a.data(), a.size1(), res.data()); return res; } 
+	template<class M> matrix_t<M> transpose(const compact_matrix<M>& a) 	{ matrix_t<M> res(a.size2(), a.size1()); malgo::raw::transpose(a.data(), a.size1(), a.size2(), res.data()); return res; } 
+	template<class M> matrix_t<M> inverse(const compact_matrix<M>& a) 		{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_inverse(a.data(), a.size1(), res.data()); return res; } 
+	template<class M> matrix_t<M> exponent(const compact_matrix<M>& a) 	{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_exponent(a.data(), a.size1(), res.data()); return res; } 
 }
 
 template<class C, class M> std::basic_ostream<C> &

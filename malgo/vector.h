@@ -31,24 +31,8 @@ namespace malgo
 			using const_iterator = const T*; 
 			using vector = malgo::vector<T,A>;
 	};
-
-	template <class T, class A> struct traits<const_vecview<T,A>> { 
-			using type = T;
-			using alloc = A;
-			using iterator = T*; 
-			using const_iterator = const T*; 
-			using vector = malgo::vector<T,A>;
-	};
 	
 	template <class T, class A> struct traits<uncompact_vecview<T,A>> { 
-			using type = T;
-			using alloc = A;
-			using iterator = T*; 
-			using const_iterator = const T*; 
-			using vector = malgo::vector<T,A>;
-	};
-
-	template <class T, class A> struct traits<const_uncompact_vecview<T,A>> { 
 			using type = T;
 			using alloc = A;
 			using iterator = T*; 
@@ -163,8 +147,8 @@ namespace malgo
 		template <class V> vector& operator = (vector_root<V>&& oth) 		{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
 	};
 
+	//Lexicographic compare
 	template<class V, class W> int compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
-
 	template<class A, class B> auto operator == (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
 	template<class A, class B> auto operator != (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) != 0) { return compare(a,b) != 0; }
 	template<class A, class B> auto operator <  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <  0) { return compare(a,b) <  0; }

@@ -10,7 +10,7 @@
 
 int main()
 {
-	malgo::vector<double> u {4,4,4,0,0};
+/*	malgo::vector<double> u {4,4,4,0,0};
 	malgo::vector<double> v {2,0,0,1};
 	malgo::vector<double> q;
 	malgo::vector<double> r;
@@ -20,5 +20,9 @@ int main()
 	PRINT(u);
 	PRINT(v);
 	PRINT(q);
-	PRINT(r);
+	PRINT(r);*/
+
+	malgo::matrix<double> m {{1,2,3,4},{5,6,7,8},{9,10,11,12}};
+
+	nos::println(m + m);
 }

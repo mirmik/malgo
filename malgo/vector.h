@@ -59,16 +59,6 @@ namespace malgo
 	template <class V>
 	struct const_vector_root
 	{
-		using type = typename traits<V>::type;
-		using iterator = typename traits<V>::iterator;
-		using const_iterator = typename traits<V>::const_iterator;
-		
-		const V& 				self_cast() const 			{ return *static_cast<const V*>(this); }
-		int 					size() const 				{ return self_cast().size(); }
-		const type* 			data() const				{ return self_cast().data(); }
-		const type& 			operator[](int i) const 	{ return self_cast()[i]; }
-		const_iterator 			begin() const 				{ return self_cast().begin(); };
-		const_iterator const 	end() const 				{ return self_cast().end(); };
 	};
 
 	template <class V>
@@ -78,22 +68,21 @@ namespace malgo
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
-
-		using parent::self_cast;
-		using parent::data;
-		using parent::size;
-		using parent::operator[];
-		using parent::begin;
-		using parent::end;
+		
+		const V& 			self_cast() const 				{ return *static_cast<const V*>(this); }
+		const type* 		data() const					{ return self_cast().data(); }
+		int 				size() const 					{ return self_cast().size(); }
+		const type& 		operator[](int i) const 		{ return self_cast()[i]; }
 		
 		V& 					self_cast() 					{ return *static_cast<V*>(this); }
-
 		type* 				data()							{ return self_cast().data(); }
 		type& 				operator[](int i) 				{ return self_cast()[i]; }
-		const type& 		operator[](int i) const 		{ return self_cast()[i]; }
-		iterator 			begin() 						{ return self_cast().begin(); };
-		iterator const 		end() 							{ return self_cast().end(); };
 		void 				reset(int n, const type& val)	{ return self_cast().reset(n, val); }
+
+		const_iterator 			begin() const 				{ return self_cast().begin(); };
+		const_iterator const 	end() const 				{ return self_cast().end(); };
+		iterator 				begin() 					{ return self_cast().begin(); };
+		iterator const 			end() 						{ return self_cast().end(); };
 
 		V& 						operator = (const vector_root& u) 		{ return self_cast() = u; }
 		template<class U> V& 	operator = (const vector_root<U>& u) 	{ return self_cast() = u; }

@@ -59,7 +59,6 @@ namespace malgo
 	template <class V>
 	struct vector_root
 	{
-		using parent = const_vector_root<V>;
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;

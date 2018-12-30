@@ -6,8 +6,6 @@
 
 #include <malgo/util.h>
 
-#include <nos/trace.h>
-
 namespace malgo
 {
 	template <class T, class A> class vector;
@@ -182,8 +180,8 @@ namespace malgo
 	template<class V> typename traits<V>::type maxelem(const vector_root<V> & a) { return fold(detail::max{}, a[0], a); }
 
 	template<class V, class W> typename traits<V>::type dot(const vector_root<V>& a, const vector_root<W>& b) 	{ return sum(a * b); }
-	template<class V> typename traits<V>::type 			length2(const vector_root<V> & a) 							{ return dot(a, a); }
-	template<class V> typename traits<V>::type 			length(const vector_root<V> & a) 							{ return std::sqrt(length2(a)); }
+	template<class V> typename traits<V>::type 			length2(const vector_root<V> & a) 						{ return dot(a, a); }
+	template<class V> typename traits<V>::type 			length(const vector_root<V> & a) 						{ return std::sqrt(length2(a)); }
 }
 
 template<class C, class V> std::basic_ostream<C> &

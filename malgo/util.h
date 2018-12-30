@@ -2,8 +2,6 @@
 #define MALGO_UTILCLASSES_H
 
 #include <cmath>
-#include <nos/print.h>
-#include <nos/trace.h>
 
 namespace malgo
 {

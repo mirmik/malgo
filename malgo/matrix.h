@@ -176,7 +176,7 @@ namespace malgo
 		template <class W> matrix_view(matrix_root<W>& mat) : parent(mat.data(), mat.size1(), mat.size2()) {};
 	};
 
-	template<class F, class A, class B> using mxm_apply_t = matrix<ret_t<F, type_t<A>, type_t<B>>>;
+	template<class F, class A, class B> using mxm_apply_t = matrix<ret_t<F, type_t<A>, type_t<B>>, alloc_t<A>>;
 	template<class F, class A, class B> mxm_apply_t<F,A,B> elementwise(F&& f, const matrix_root<A>& a, const matrix_root<B>& b) { mxm_apply_t<F,A,B> res(a.size1(), b.size2()); for (int i = 0; i < a.size(); ++i) res.elem(i) = f(a.elem(i), b.elem(i)); return res; }
 	
 	//Lexicographic compare

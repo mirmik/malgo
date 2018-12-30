@@ -136,6 +136,7 @@ namespace malgo
 		using parent = compact_vector_root<vector<T, A>>;
 		using keeper = vector_keeper<vector<T, A>>;
 		vector()										{};
+		vector(vector&& oth)							: parent(oth._data, oth._size) { oth._size = 0; oth._data = nullptr; };
 		vector(int size)								{ keeper::create(size); }
 		vector(const T* data, int size)					{ keeper::create(size); std::copy(data, data+size, parent::_data); }
 		vector(const std::initializer_list<T>& list)	{ keeper::create(list.size()); std::copy(list.begin(), list.end(), parent::_data); }
@@ -147,8 +148,15 @@ namespace malgo
 		template <class V> vector& operator = (vector_root<V>&& oth) 		{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
 	};
 
+	template<class F, class A, class B> using vxv_apply_t = vector<ret_t<F, type_t<A>, type_t<B>>, alloc_t<A>>;
+	template<class F, class A, class B> using sxv_apply_t = vector<ret_t<F, A, type_t<B>>, alloc_t<A>>;
+	template<class F, class A, class B> using vxs_apply_t = vector<ret_t<F, type_t<A>, B>, alloc_t<A>>;
+	template<class F, class A, class B> vxv_apply_t<F,A,B> elementwise(F&& f, const vector_root<A>& a, const vector_root<B>& b) 	{ vxv_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b[i]); 	return res; }
+	template<class F, class A, class B> sxv_apply_t<F,A,B> sxv_elementwise(F&& f, const A& a, const vector_root<B>& b) 				{ sxv_apply_t<F,A,B> res(b.size()); for (int i = 0; i < b.size(); ++i) res[i] = f(a, 	 b[i]); return res; }
+	template<class F, class A, class B> vxs_apply_t<F,A,B> vxs_elementwise(F&& f, const vector_root<A>& a, const B& b) 				{ vxs_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b); 	return res; }
+
 	//Lexicographic compare
-	template<class V, class W> int compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
+	template<class V, class W> compare_t<V,W> compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
 	template<class A, class B> auto operator == (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
 	template<class A, class B> auto operator != (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) != 0) { return compare(a,b) != 0; }
 	template<class A, class B> auto operator <  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <  0) { return compare(a,b) <  0; }
@@ -156,13 +164,14 @@ namespace malgo
 	template<class A, class B> auto operator <= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <= 0) { return compare(a,b) <= 0; }
 	template<class A, class B> auto operator >= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >= 0) { return compare(a,b) >= 0; }
 
-	template<class V, class W, class F> typename V::vector elementwise_do(const vector_root<V>& a, const vector_root<W>& b, F&& f) { typename V::vector res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b[i]); return res; }
-	template<class V, class A, class F> A fold(F f, A a, const vector_root<V> & b) { for (const auto& r : b) { a = f(a, r); } return a; }
+	template<class F, class V, class A> A fold(F f, A a, const vector_root<V> & b) { for (const auto& r : b) { a = f(a, r); } return a; }
 
-	template<class V, class W> typename traits<V>::vector operator + (const vector_root<V>& a, const vector_root<W>& b) { return elementwise_do(a, b, detail::op_add{}); }
-	template<class V, class W> typename traits<V>::vector operator - (const vector_root<V>& a, const vector_root<W>& b) { return elementwise_do(a, b, detail::op_sub{}); }
-	template<class V, class W> typename traits<V>::vector operator * (const vector_root<V>& a, const vector_root<W>& b) { return elementwise_do(a, b, detail::op_mul{}); }
-	template<class V, class W> typename traits<V>::vector operator / (const vector_root<V>& a, const vector_root<W>& b) { return elementwise_do(a, b, detail::op_div{}); }
+	template<class V, class W> vxv_apply_t<detail::op_add,V,W> operator + (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_add{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_sub,V,W> operator - (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_sub{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_mul,V,W> operator * (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> sxv_apply_t<detail::op_mul,V,W> operator * (const V& a, const vector_root<W>& b) { return svx_elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> vxs_apply_t<detail::op_mul,V,W> operator * (const vector_root<V>& a, const W& b) { return vxs_elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_div,V,W> operator / (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_div{}, a, b); }
 
 	// Reduction functions on vectors
 	template<class V> bool any (const vector_root<V> & a) { return fold(detail::op_or{}, false, a); }

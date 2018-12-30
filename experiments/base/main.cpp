@@ -22,7 +22,10 @@ int main()
 	PRINT(q);
 	PRINT(r);*/
 
+	malgo::vector<double> v {1,2,3};
+
 	malgo::matrix<double> m {{1,2,3,4},{5,6,7,8},{9,10,11,12}};
 
 	nos::println(m + m);
+	nos::println(v * 3);
 }

@@ -90,7 +90,7 @@ namespace malgo
 
 		template <class W> V& operator = (const vroot<W>& oth) 	{ if ((void*)&oth == (void*)this) return (V&)*this; std::copy(oth.begin(), oth.end(), _data); return (V&)*this; }
 
-		compact_vroot() 													{}
+		compact_vroot() 					{}
 		compact_vroot(type* data, int size) : _data(data), _size(size)	{}
 	};
 

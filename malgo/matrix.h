@@ -133,16 +133,17 @@ namespace malgo
 		type* 							_data;
 		int 							_size1;
 		int 							_size2;
-		int 							size() const 				{ return _size1 * _size2; }
-		int 							size1() const				{ return _size1; }
-		int 							size2() const				{ return _size2; }
-		type*							data()						{ return _data; }
-		const type* 					data() const				{ return _data; }
-		type&							elem(int i)					{ return _data[i]; }
-		const type&						elem(int i)	const			{ return _data[i]; }
-		vecview<type, alloc>	 		operator[](int i) 			{ return { _data + i * _size2, _size2 }; }
-		const vecview<type, alloc>		operator[](int i) const 	{ return { _data + i * _size2, _size2 }; }
-		type&							operator()(int i, int j)	{ return _data[i * _size2 + j]; }
+		int 							size() const 					{ return _size1 * _size2; }
+		int 							size1() const					{ return _size1; }
+		int 							size2() const					{ return _size2; }
+		type*							data()							{ return _data; }
+		const type* 					data() const					{ return _data; }
+		type&							elem(int i)						{ return _data[i]; }
+		const type&						elem(int i)	const				{ return _data[i]; }
+		vecview<type, alloc>	 		operator[](int i) 				{ return { _data + i * _size2, _size2 }; }
+		const vecview<type, alloc>		operator[](int i) const 		{ return { _data + i * _size2, _size2 }; }
+		type&							operator()(int i, int j)		{ return _data[i * _size2 + j]; }
+		const type&						operator()(int i, int j) const	{ return _data[i * _size2 + j]; }
 
 		type* 								begin() 		{ return _data; }
 		const type* 						begin() const 	{ return _data; }
@@ -170,6 +171,8 @@ namespace malgo
 		matrix() {}
 		matrix(int size1, int size2) { keeper::create(size1, size2); }
 		matrix(const std::initializer_list<std::initializer_list<T>>& list) { keeper::create(list.size(), list.begin()->size()); T* ptr = parent::_data; for (const auto& c : list) { for (const auto& v : c) { *ptr++ = v; } } }
+		matrix(const matrix& oth) { keeper::create(oth.size1(), oth.size2()); T* ptr = parent::_data; const T*mptr = oth.data(); for (int i = 0; i < parent::size(); ++i) *ptr++ = *mptr++; }
+		template<class M> matrix(const mroot<M>& oth) { keeper::create(oth.size1(), oth.size2()); T* ptr = parent::_data; const T*mptr = oth.data(); for (int i = 0; i < parent::size(); ++i) *ptr++ = *mptr++; }
 	};
 
 	template <class T, class A = std::allocator<T>>
@@ -200,8 +203,10 @@ namespace malgo
 
 	//Basealgo
 	template<class M> matrix_t<M> transpose(const compact_matrix<M>& a) 	{ matrix_t<M> res(a.size2(), a.size1()); malgo::raw::transpose(a.data(), a.size1(), a.size2(), res.data()); return res; } 
-	template<class M> matrix_t<M> inverse(const compact_matrix<M>& a) 		{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_inverse(a.data(), a.size1(), res.data()); return res; } 
+	//template<class M> matrix_t<M> inverse(const compact_matrix<M>& a) 		{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_inverse(a.data(), a.size1(), res.data()); return res; } 
 	template<class M> matrix_t<M> exponent(const compact_matrix<M>& a) 	{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_exponent(a.data(), a.size1(), res.data()); return res; } 
+
+	template<class T, class A = std::allocator<T>> matrix<T,A> diag(const std::initializer_list<T>& lst) { matrix<T,A> ret(lst.size(), lst.size()); const auto* data = lst.begin(); for (int i = 0; i < lst.size(); ++i) ret(i,i) = data[i]; return ret; } 
 }
 
 
@@ -216,7 +221,7 @@ operator << (std::basic_ostream<C> & out, const malgo::mroot<M> & m)
 		{
 			out << m[i][j] << ',';
 		}
-		out << m[i][m.size2() - 1] << '}';
+		out << m[i][m.size2() - 1] << '}' << ',';
 	}
 	out << '{';
 	for (int j = 0; j < m.size2() - 1; ++j)

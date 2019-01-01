@@ -12,6 +12,8 @@ namespace malgo
 	template <typename A> constexpr A min(A a, A b) { return a < b ? a : b; }
 	template <typename A> constexpr void swap(A& a, A& b) { A tmp = a; a = b; b = tmp; }  
 	template <typename A> constexpr A abs(A a) { return a >= 0 ? a : -a; }
+	template <class A, class B> constexpr A sign(const A& mag, const B& sign) { return sign >= 0 ? abs(mag) : -abs(mag); }  
+	template <class A> constexpr A sqr(const A& a) { return a*a; }  
 
 	template <class A> struct traits;
 	template <class A> using type_t = typename traits<A>::type;

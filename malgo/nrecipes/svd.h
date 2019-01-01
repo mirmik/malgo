@@ -22,7 +22,7 @@ namespace malgo
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
 
-		void solve(const vroot<M> &b, vroot<M> &x, type_t<M> thresh = -1.);
+		template<class A, class B> void solve(const vroot<A> &b, vroot<B> &x, type_t<M> thresh = -1.);
 		void solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh = -1.);
 
 		int 			rank(type_t<M> thresh = -1.);
@@ -40,8 +40,9 @@ namespace malgo
 		type_t<M> pythag(const type_t<M> a, const type_t<M> b);
 	};
 
-	template<class M>
-	void SVD<M>::solve(const vroot<M> &b, vroot<M> &x, type_t<M> thresh)
+	template<class M> 
+	template<class A, class B> 
+	void SVD<M>::solve(const vroot<A> &b, vroot<B> &x, type_t<M> thresh)
 	{
 		int i, j, jj;
 		type_t<M> s;
@@ -155,7 +156,7 @@ namespace malgo
 						s += u[k][i] * u[k][i];
 					}
 					f = u[i][i];
-					g = -SIGN(sqrt(s), f);
+					g = -malgo::sign(sqrt(s), f);
 					h = f * g - s;
 					u[i][i] = f - g;
 					for (j = l - 1; j < n; j++)
@@ -180,7 +181,7 @@ namespace malgo
 						s += u[i][k] * u[i][k];
 					}
 					f = u[i][l - 1];
-					g = -SIGN(sqrt(s), f);
+					g = -malgo::sign(sqrt(s), f);
 					h = f * g - s;
 					u[i][l - 1] = f - g;
 					for (k = l - 1; k < n; k++) rv1[k] = u[i][k] / h;
@@ -192,7 +193,7 @@ namespace malgo
 					for (k = l - 1; k < n; k++) u[i][k] *= scale;
 				}
 			}
-			anorm = MAX(anorm, (abs(w[i]) + abs(rv1[i])));
+			anorm = malgo::max(anorm, (abs(w[i]) + abs(rv1[i])));
 		}
 		for (i = n - 1; i >= 0; i--)
 		{
@@ -290,7 +291,7 @@ namespace malgo
 				h = rv1[k];
 				f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2.0 * h * y);
 				g = pythag(f, 1.0);
-				f = ((x - z) * (x + z) + h * ((y / (f + SIGN(g, f))) - h)) / x;
+				f = ((x - z) * (x + z) + h * ((y / (f + malgo::sign(g, f))) - h)) / x;
 				c = s = 1.0;
 				for (j = l; j <= nm; j++)
 				{
@@ -388,10 +389,9 @@ namespace malgo
 	type_t<M> SVD<M>::pythag(const type_t<M> a, const type_t<M> b)
 	{
 		type_t<M> absa = abs(a), absb = abs(b);
-		return (absa > absb ? absa * sqrt(1.0 + SQR(absb / absa)) :
-		        (absb == 0.0 ? 0.0 : absb * sqrt(1.0 + SQR(absa / absb))));
+		return (absa > absb ? absa * sqrt(1.0 + malgo::sqr(absb / absa)) :
+		        (absb == 0.0 ? 0.0 : absb * sqrt(1.0 + malgo::sqr(absa / absb))));
 	}
-
 }
 
 #endif

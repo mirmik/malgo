@@ -2,9 +2,12 @@
 #define MALGO_UTILCLASSES_H
 
 #include <cmath>
+#include <malgo/predecl.h>
 
 namespace malgo
 {
+	template<typename T> constexpr T& force(T&& t){ return t; }
+
 	template <typename A> constexpr A max(A a, A b) { return a > b ? a : b; } 
 	template <typename A> constexpr A min(A a, A b) { return a < b ? a : b; }
 	template <typename A> constexpr void swap(A& a, A& b) { A tmp = a; a = b; b = tmp; }  
@@ -15,6 +18,8 @@ namespace malgo
 	template <class A> using alloc_t = typename traits<A>::alloc;
 	template <class A> using vector_t = typename traits<A>::vector;
 	template <class A> using matrix_t = typename traits<A>::matrix;
+	template <class A> using vecout_t = typename traits<A>::vecout;
+	template <class A> using matout_t = typename traits<A>::matout;
 
 	template<class F, class... T> 	using ret_t = decltype(std::declval<F>()(std::declval<T>()...));
 	template<class A, class B> 		using compare_t = decltype(type_t<A>() - type_t<B>());

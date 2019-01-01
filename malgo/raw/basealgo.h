@@ -14,6 +14,8 @@ namespace malgo
 		template<class A, class B, class C> 	void elwise_mul(int size, A a, B b, C c) 	{ elementwise3(detail::op_mul{}, size, a, b, c); }
 		template<class A, class B, class C> 	void elwise_div(int size, A a, B b, C c) 	{ elementwise3(detail::op_div{}, size, a, b, c); }
 
+		//template <class A, class B, class OA, class OB> void mul;
+
 		template <class A, class B> void transpose(const A* a, int m, int n, B* b)
 		{
 			int i, j;

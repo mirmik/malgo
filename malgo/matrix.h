@@ -3,7 +3,8 @@
 
 #include <malgo/util.h>
 #include <malgo/vector.h>
-#include <malgo/basealgo.h>
+#include <malgo/algo/multiply.h>
+#include <malgo/raw/basealgo.h>
 
 #include <nos/trace.h>
 
@@ -66,7 +67,6 @@ namespace malgo
 		using type 					= T;
 		using alloc 				= A;
 		using matrix 				= malgo::matrix<T,A>;
-		using matrix_view 			= malgo::matrix_view<T,A>;
 		using const_matrix_view 	= malgo::const_matrix_view<T,A>;
 		using vector 				= malgo::vector<T,A>;
 		using iterator 				= T*;
@@ -75,6 +75,7 @@ namespace malgo
 		using const_iterator1 		= const_matrix_iterator1<matrix>;
 		using iterator2 			= matrix_iterator2<matrix>;
 		using const_iterator2 		= const_matrix_iterator2<matrix>;
+		using matout = matrix_view<T,A>;
 	};
 
 	template <class T, class A> struct traits<matrix_view<T, A>>
@@ -156,6 +157,8 @@ namespace malgo
 		const_matrix_iterator2<M> 			begin2() const 	{ return {static_cast<M&>(*this), 0, 0}; }
 		matrix_iterator2<M> const 			end2() 			{ return {static_cast<M&>(*this), 0, _size2 }; }
 		const_matrix_iterator2<M> const 	end2() const 	{ return {static_cast<M&>(*this), 0, _size2 }; }
+
+		operator matrix_view<type_t<M>, alloc_t<M>>() { return {_data, _size1, _size2}; }
 	};
 
 	template <class T, class A = std::allocator<T>>
@@ -199,6 +202,7 @@ namespace malgo
 	template<class M> matrix_t<M> inverse(const compact_matrix<M>& a) 		{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_inverse(a.data(), a.size1(), res.data()); return res; } 
 	template<class M> matrix_t<M> exponent(const compact_matrix<M>& a) 	{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_exponent(a.data(), a.size1(), res.data()); return res; } 
 }
+
 
 template<class C, class M> std::basic_ostream<C> &
 operator << (std::basic_ostream<C> & out, const malgo::matrix_root<M> & m)

@@ -20,6 +20,7 @@ namespace malgo
 			using iterator = T*; 
 			using const_iterator = const T*; 
 			using vector = malgo::vector<T,A>;
+			using vecout = vecview<T,A>;
 	};
 
 	template <class T, class A> struct traits<vecview<T,A>> { 
@@ -85,6 +86,10 @@ namespace malgo
 		const iterator 			end() 						{ return _data + _size; }
 		const const_iterator 	end() const 				{ return _data + _size; }
 
+		operator vecview<type_t<V>, alloc_t<V>>() { return {_data, _size}; }
+
+		template <class W> V& operator = (const vector_root<W>& oth) 	{ if ((void*)&oth == (void*)this) return (V&)*this; std::copy(oth.begin(), oth.end(), _data); return (V&)*this; }
+
 		compact_vector_root() 													{}
 		compact_vector_root(type* data, int size) : _data(data), _size(size)	{}
 	};
@@ -118,6 +123,7 @@ namespace malgo
 	struct vecview : public compact_vector_root<vecview<T, A>>
 	{
 		using parent = compact_vector_root<vecview<T, A>>;
+		using parent::operator=;
 		vecview(T* data, int size) : parent(data, size) {}
 	};
 
@@ -153,6 +159,8 @@ namespace malgo
 	template<class F, class A, class B> sxv_apply_t<F,A,B> sxv_elementwise(F&& f, const A& a, const vector_root<B>& b) 				{ sxv_apply_t<F,A,B> res(b.size()); for (int i = 0; i < b.size(); ++i) res[i] = f(a, 	 b[i]); return res; }
 	template<class F, class A, class B> vxs_apply_t<F,A,B> vxs_elementwise(F&& f, const vector_root<A>& a, const B& b) 				{ vxs_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b); 	return res; }
 
+	//template<class F, class A, class B> A& self_elementwise(F&& f, vector_root<A>& a, const vector_root<B>& b) 	{ for (int i = 0; i < a.size(); ++i) a[i] = f(a[i], b[i]); 	return res; }
+	
 	//Lexicographic compare
 	template<class V, class W> compare_t<V,W> compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
 	template<class A, class B> auto operator == (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
@@ -170,6 +178,8 @@ namespace malgo
 	template<class V, class W> sxv_apply_t<detail::op_mul,V,W> operator * (const V& a, const vector_root<W>& b) { return svx_elementwise(detail::op_mul{}, a, b); }
 	template<class V, class W> vxs_apply_t<detail::op_mul,V,W> operator * (const vector_root<V>& a, const W& b) { return vxs_elementwise(detail::op_mul{}, a, b); }
 	template<class V, class W> vxv_apply_t<detail::op_div,V,W> operator / (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_div{}, a, b); }
+
+	//template<class V, class W> V& operator += (vector_root& self, const vector_root<W>& b) { return self_elementwise(detail::op_sum{}, a, b); }
 
 	// Reduction functions on vectors
 	template<class V> bool any (const vector_root<V> & a) { return fold(detail::op_or{}, false, a); }

@@ -144,6 +144,7 @@ namespace malgo
 		vector(int size)								{ keeper::create(size); }
 		vector(const T* data, int size)					{ keeper::create(size); std::copy(data, data+size, parent::_data); }
 		vector(const std::initializer_list<T>& list)	{ keeper::create(list.size()); std::copy(list.begin(), list.end(), parent::_data); }
+		vector(const vector& oth) { keeper::create(oth.size()); T* ptr = parent::_data; const T*mptr = oth.data(); for (int i = 0; i < parent::size(); ++i) *ptr++ = *mptr++; }
 		void reset(int size, const T& val)				{ keeper::invalidate(); keeper::create(size); for (auto& ref : *this) ref = val; }
 
 		vector& operator = (const vector& oth) 								{ if (&oth == this) return *this; keeper::resize(oth.size()); std::copy(oth.begin(), oth.end(), parent::_data); return *this; }

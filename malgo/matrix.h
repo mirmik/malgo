@@ -9,6 +9,8 @@
 
 #include <nos/trace.h>
 
+#include <linalg.h>
+
 namespace malgo
 {
 	template <class M> struct matrix_iterator1;
@@ -173,6 +175,22 @@ namespace malgo
 		matrix(const std::initializer_list<std::initializer_list<T>>& list) { keeper::create(list.size(), list.begin()->size()); T* ptr = parent::_data; for (const auto& c : list) { for (const auto& v : c) { *ptr++ = v; } } }
 		matrix(const matrix& oth) { keeper::create(oth.size1(), oth.size2()); T* ptr = parent::_data; const T*mptr = oth.data(); for (int i = 0; i < parent::size(); ++i) *ptr++ = *mptr++; }
 		template<class M> matrix(const mroot<M>& oth) { keeper::create(oth.size1(), oth.size2()); T* ptr = parent::_data; const T*mptr = oth.data(); for (int i = 0; i < parent::size(); ++i) *ptr++ = *mptr++; }
+	
+		template<int N> 
+		matrix(const std::vector<linalg::vec<T,N>>& oth) 
+		{ 
+			keeper::create(oth.size(), N); 
+			T* ptr = parent::data();
+
+			for (int i = 0; i < oth.size(); ++i) 
+				for (int j = 0; j < N; ++j)
+					*ptr++ = oth[i][j];
+
+			//T* ptr = parent::_data; 
+			//const T*mptr = oth.data(); 
+			//for (int i = 0; i < parent::size(); ++i) *ptr++ = *mptr++; 
+		}
+		
 	};
 
 	template <class T, class A = std::allocator<T>>

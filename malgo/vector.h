@@ -40,7 +40,7 @@ namespace malgo
 	};
 
 	template <class V>
-	struct vector_root
+	struct vroot
 	{
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
@@ -61,14 +61,14 @@ namespace malgo
 		iterator 				begin() 					{ return self_cast().begin(); };
 		iterator const 			end() 						{ return self_cast().end(); };
 
-		V& 						operator = (const vector_root& u) 		{ return self_cast() = u; }
-		template<class U> V& 	operator = (const vector_root<U>& u) 	{ return self_cast() = u; }
+		V& 						operator = (const vroot& u) 		{ return self_cast() = u; }
+		template<class U> V& 	operator = (const vroot<U>& u) 	{ return self_cast() = u; }
 	};
 
 	template <class V>
-	struct compact_vector_root : public vector_root<V>
+	struct compact_vroot : public vroot<V>
 	{
-		using parent = vector_root<V>;
+		using parent = vroot<V>;
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
@@ -88,16 +88,16 @@ namespace malgo
 
 		operator vecview<type_t<V>, alloc_t<V>>() { return {_data, _size}; }
 
-		template <class W> V& operator = (const vector_root<W>& oth) 	{ if ((void*)&oth == (void*)this) return (V&)*this; std::copy(oth.begin(), oth.end(), _data); return (V&)*this; }
+		template <class W> V& operator = (const vroot<W>& oth) 	{ if ((void*)&oth == (void*)this) return (V&)*this; std::copy(oth.begin(), oth.end(), _data); return (V&)*this; }
 
-		compact_vector_root() 													{}
-		compact_vector_root(type* data, int size) : _data(data), _size(size)	{}
+		compact_vroot() 													{}
+		compact_vroot(type* data, int size) : _data(data), _size(size)	{}
 	};
 
 	template <class V>
-	struct uncompact_vector_root : public vector_root<V>
+	struct uncompact_vroot : public vroot<V>
 	{
-		using parent = vector_root<V>;
+		using parent = vroot<V>;
 		using type = typename traits<V>::type;
 		using iterator = typename traits<V>::iterator;
 		using const_iterator = typename traits<V>::const_iterator;
@@ -115,29 +115,29 @@ namespace malgo
 		const iterator 			end() 						{ return {_data + _size, _step}; }
 		const const_iterator 	end() const 				{ return {_data + _size, _step}; }
 	
-		uncompact_vector_root() 																		{}
-		uncompact_vector_root(type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
+		uncompact_vroot() 																		{}
+		uncompact_vroot(type* data, int size, int step) : _data(data), _size(size), _step(step)	{}
 	};
 
 	template <class T, class A = std::allocator<T>>
-	struct vecview : public compact_vector_root<vecview<T, A>>
+	struct vecview : public compact_vroot<vecview<T, A>>
 	{
-		using parent = compact_vector_root<vecview<T, A>>;
+		using parent = compact_vroot<vecview<T, A>>;
 		using parent::operator=;
 		vecview(T* data, int size) : parent(data, size) {}
 	};
 
 	template <class T, class A = std::allocator<T>>
-	struct uncompact_vecview : public uncompact_vector_root<uncompact_vecview<T, A>>
+	struct uncompact_vecview : public uncompact_vroot<uncompact_vecview<T, A>>
 	{
-		using parent = uncompact_vector_root<uncompact_vecview<T, A>>;
+		using parent = uncompact_vroot<uncompact_vecview<T, A>>;
 		uncompact_vecview(T* data, int size, int step) : parent(data, size, step) {}
 	};
 
 	template <class T, class A = std::allocator<T>>
-	struct vector : public compact_vector_root<vector<T, A>>, public vector_keeper<vector<T, A>>
+	struct vector : public compact_vroot<vector<T, A>>, public vector_keeper<vector<T, A>>
 	{
-		using parent = compact_vector_root<vector<T, A>>;
+		using parent = compact_vroot<vector<T, A>>;
 		using keeper = vector_keeper<vector<T, A>>;
 		vector()										{};
 		vector(vector&& oth)							: parent(oth._data, oth._size) { oth._size = 0; oth._data = nullptr; };
@@ -148,54 +148,54 @@ namespace malgo
 
 		vector& operator = (const vector& oth) 								{ if (&oth == this) return *this; keeper::resize(oth.size()); std::copy(oth.begin(), oth.end(), parent::_data); return *this; }
 		vector& operator = (vector&& oth) 									{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
-		template <class V> vector& operator = (const vector_root<V>& oth) 	{ if (&oth == this) return *this; keeper::resize(oth.size()); std::copy(oth.begin(), oth.end(), parent::_data); return *this; }
-		template <class V> vector& operator = (vector_root<V>&& oth) 		{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
+		template <class V> vector& operator = (const vroot<V>& oth) 	{ if (&oth == this) return *this; keeper::resize(oth.size()); std::copy(oth.begin(), oth.end(), parent::_data); return *this; }
+		template <class V> vector& operator = (vroot<V>&& oth) 		{ parent::_data = oth._data; parent::_size = oth._size; oth._data = nullptr; oth._size = 0; return *this; }
 	};
 
 	template<class F, class A, class B> using vxv_apply_t = vector<ret_t<F, type_t<A>, type_t<B>>, alloc_t<A>>;
 	template<class F, class A, class B> using sxv_apply_t = vector<ret_t<F, A, type_t<B>>, alloc_t<A>>;
 	template<class F, class A, class B> using vxs_apply_t = vector<ret_t<F, type_t<A>, B>, alloc_t<A>>;
-	template<class F, class A, class B> vxv_apply_t<F,A,B> elementwise(F&& f, const vector_root<A>& a, const vector_root<B>& b) 	{ vxv_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b[i]); 	return res; }
-	template<class F, class A, class B> sxv_apply_t<F,A,B> sxv_elementwise(F&& f, const A& a, const vector_root<B>& b) 				{ sxv_apply_t<F,A,B> res(b.size()); for (int i = 0; i < b.size(); ++i) res[i] = f(a, 	 b[i]); return res; }
-	template<class F, class A, class B> vxs_apply_t<F,A,B> vxs_elementwise(F&& f, const vector_root<A>& a, const B& b) 				{ vxs_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b); 	return res; }
+	template<class F, class A, class B> vxv_apply_t<F,A,B> elementwise(F&& f, const vroot<A>& a, const vroot<B>& b) 	{ vxv_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b[i]); 	return res; }
+	template<class F, class A, class B> sxv_apply_t<F,A,B> sxv_elementwise(F&& f, const A& a, const vroot<B>& b) 				{ sxv_apply_t<F,A,B> res(b.size()); for (int i = 0; i < b.size(); ++i) res[i] = f(a, 	 b[i]); return res; }
+	template<class F, class A, class B> vxs_apply_t<F,A,B> vxs_elementwise(F&& f, const vroot<A>& a, const B& b) 				{ vxs_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b); 	return res; }
 
-	//template<class F, class A, class B> A& self_elementwise(F&& f, vector_root<A>& a, const vector_root<B>& b) 	{ for (int i = 0; i < a.size(); ++i) a[i] = f(a[i], b[i]); 	return res; }
+	//template<class F, class A, class B> A& self_elementwise(F&& f, vroot<A>& a, const vroot<B>& b) 	{ for (int i = 0; i < a.size(); ++i) a[i] = f(a[i], b[i]); 	return res; }
 	
 	//Lexicographic compare
-	template<class V, class W> compare_t<V,W> compare(const vector_root<V>& a, const vector_root<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
-	template<class A, class B> auto operator == (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
-	template<class A, class B> auto operator != (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) != 0) { return compare(a,b) != 0; }
-	template<class A, class B> auto operator <  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <  0) { return compare(a,b) <  0; }
-	template<class A, class B> auto operator >  (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >  0) { return compare(a,b) >  0; }
-	template<class A, class B> auto operator <= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) <= 0) { return compare(a,b) <= 0; }
-	template<class A, class B> auto operator >= (const vector_root<A> & a, const vector_root<B> & b) -> decltype(compare(a,b) >= 0) { return compare(a,b) >= 0; }
+	template<class V, class W> compare_t<V,W> compare(const vroot<V>& a, const vroot<W>& b) { if (a.size() != b.size()) return a.size() - b.size(); for (int i = 0; i < a.size(); ++i) if (a[i] != b[i]) return a[i] - b[i]; return 0; }	
+	template<class A, class B> auto operator == (const vroot<A> & a, const vroot<B> & b) -> decltype(compare(a,b) == 0) { return compare(a,b) == 0; }
+	template<class A, class B> auto operator != (const vroot<A> & a, const vroot<B> & b) -> decltype(compare(a,b) != 0) { return compare(a,b) != 0; }
+	template<class A, class B> auto operator <  (const vroot<A> & a, const vroot<B> & b) -> decltype(compare(a,b) <  0) { return compare(a,b) <  0; }
+	template<class A, class B> auto operator >  (const vroot<A> & a, const vroot<B> & b) -> decltype(compare(a,b) >  0) { return compare(a,b) >  0; }
+	template<class A, class B> auto operator <= (const vroot<A> & a, const vroot<B> & b) -> decltype(compare(a,b) <= 0) { return compare(a,b) <= 0; }
+	template<class A, class B> auto operator >= (const vroot<A> & a, const vroot<B> & b) -> decltype(compare(a,b) >= 0) { return compare(a,b) >= 0; }
 
-	template<class F, class V, class A> A fold(F f, A a, const vector_root<V> & b) { for (const auto& r : b) { a = f(a, r); } return a; }
+	template<class F, class V, class A> A fold(F f, A a, const vroot<V> & b) { for (const auto& r : b) { a = f(a, r); } return a; }
 
-	template<class V, class W> vxv_apply_t<detail::op_add,V,W> operator + (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_add{}, a, b); }
-	template<class V, class W> vxv_apply_t<detail::op_sub,V,W> operator - (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_sub{}, a, b); }
-	template<class V, class W> vxv_apply_t<detail::op_mul,V,W> operator * (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_mul{}, a, b); }
-	template<class V, class W> sxv_apply_t<detail::op_mul,V,W> operator * (const V& a, const vector_root<W>& b) { return svx_elementwise(detail::op_mul{}, a, b); }
-	template<class V, class W> vxs_apply_t<detail::op_mul,V,W> operator * (const vector_root<V>& a, const W& b) { return vxs_elementwise(detail::op_mul{}, a, b); }
-	template<class V, class W> vxv_apply_t<detail::op_div,V,W> operator / (const vector_root<V>& a, const vector_root<W>& b) { return elementwise(detail::op_div{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_add,V,W> operator + (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_add{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_sub,V,W> operator - (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_sub{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_mul,V,W> operator * (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> sxv_apply_t<detail::op_mul,V,W> operator * (const V& a, const vroot<W>& b) { return svx_elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> vxs_apply_t<detail::op_mul,V,W> operator * (const vroot<V>& a, const W& b) { return vxs_elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> vxv_apply_t<detail::op_div,V,W> operator / (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_div{}, a, b); }
 
-	//template<class V, class W> V& operator += (vector_root& self, const vector_root<W>& b) { return self_elementwise(detail::op_sum{}, a, b); }
+	//template<class V, class W> V& operator += (vroot& self, const vroot<W>& b) { return self_elementwise(detail::op_sum{}, a, b); }
 
 	// Reduction functions on vectors
-	template<class V> bool any (const vector_root<V> & a) { return fold(detail::op_or{}, false, a); }
-	template<class V> bool all (const vector_root<V> & a) { return fold(detail::op_and{}, true, a); }
-	template<class V> typename traits<V>::type sum    (const vector_root<V> & a) { return fold(detail::op_add{}, typename traits<V>::type(0), a); }
-	template<class V> typename traits<V>::type product(const vector_root<V> & a) { return fold(detail::op_mul{}, typename traits<V>::type(1), a); }
-	template<class V> typename traits<V>::type minelem(const vector_root<V> & a) { return fold(detail::min{}, a[0], a); }
-	template<class V> typename traits<V>::type maxelem(const vector_root<V> & a) { return fold(detail::max{}, a[0], a); }
+	template<class V> bool any (const vroot<V> & a) { return fold(detail::op_or{}, false, a); }
+	template<class V> bool all (const vroot<V> & a) { return fold(detail::op_and{}, true, a); }
+	template<class V> typename traits<V>::type sum    (const vroot<V> & a) { return fold(detail::op_add{}, typename traits<V>::type(0), a); }
+	template<class V> typename traits<V>::type product(const vroot<V> & a) { return fold(detail::op_mul{}, typename traits<V>::type(1), a); }
+	template<class V> typename traits<V>::type minelem(const vroot<V> & a) { return fold(detail::min{}, a[0], a); }
+	template<class V> typename traits<V>::type maxelem(const vroot<V> & a) { return fold(detail::max{}, a[0], a); }
 
-	template<class V, class W> typename traits<V>::type dot(const vector_root<V>& a, const vector_root<W>& b) 	{ return sum(a * b); }
-	template<class V> typename traits<V>::type 			length2(const vector_root<V> & a) 						{ return dot(a, a); }
-	template<class V> typename traits<V>::type 			length(const vector_root<V> & a) 						{ return std::sqrt(length2(a)); }
+	template<class V, class W> typename traits<V>::type dot(const vroot<V>& a, const vroot<W>& b) 	{ return sum(a * b); }
+	template<class V> typename traits<V>::type 			length2(const vroot<V> & a) 						{ return dot(a, a); }
+	template<class V> typename traits<V>::type 			length(const vroot<V> & a) 						{ return std::sqrt(length2(a)); }
 }
 
 template<class C, class V> std::basic_ostream<C> &
-operator << (std::basic_ostream<C> & out, const malgo::vector_root<V> & v)
+operator << (std::basic_ostream<C> & out, const malgo::vroot<V> & v)
 {
 	out << '{';
 	for (int i = 0; i < v.size() - 1; ++i)

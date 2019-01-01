@@ -3,7 +3,7 @@ In file included from ./main.cpp:6:0:
    Doub pythag(const Doub a, const Doub b);
    ^~~~
    logb
-/home/mirmik/project/malgo/./malgo/svd.h: In constructor ‘malgo::SVD<M>::SVD(malgo::matrix_root<M>&)’:
+/home/mirmik/project/malgo/./malgo/svd.h: In constructor ‘malgo::SVD<M>::SVD(malgo::mroot<M>&)’:
 /home/mirmik/project/malgo/./malgo/svd.h:18:10: error: ‘numeric_limits’ was not declared in this scope
     eps = numeric_limits<Doub>::epsilon();
           ^~~~~~~~~~~~~~
@@ -19,64 +19,64 @@ In file included from ./main.cpp:6:0:
                                 ^~~~~~~
 /home/mirmik/project/malgo/./malgo/svd.h: At global scope:
 /home/mirmik/project/malgo/./malgo/svd.h:43:21: error: variable or field ‘solve’ declared void
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                      ^~~~~~~~~~~~~~~~~~~
-/home/mirmik/project/malgo/./malgo/svd.h:43:21: error: ‘const_vector_root_t’ was not declared in this scope
-/home/mirmik/project/malgo/./malgo/svd.h:43:21: note: suggested alternative: ‘const_vector_root’
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+/home/mirmik/project/malgo/./malgo/svd.h:43:21: error: ‘const_vroot_t’ was not declared in this scope
+/home/mirmik/project/malgo/./malgo/svd.h:43:21: note: suggested alternative: ‘const_vroot’
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                      ^~~~~~~~~~~~~~~~~~~
-                     const_vector_root
+                     const_vroot
 /home/mirmik/project/malgo/./malgo/svd.h:43:42: error: expected primary-expression before ‘>’ token
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                           ^
 /home/mirmik/project/malgo/./malgo/svd.h:43:45: error: ‘b’ was not declared in this scope
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                              ^
-/home/mirmik/project/malgo/./malgo/svd.h:43:48: error: ‘vector_root_t’ was not declared in this scope
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+/home/mirmik/project/malgo/./malgo/svd.h:43:48: error: ‘vroot_t’ was not declared in this scope
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                                 ^~~~~~~~~~~~~
-/home/mirmik/project/malgo/./malgo/svd.h:43:48: note: suggested alternative: ‘vector_root’
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+/home/mirmik/project/malgo/./malgo/svd.h:43:48: note: suggested alternative: ‘vroot’
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                                 ^~~~~~~~~~~~~
-                                                vector_root
+                                                vroot
 /home/mirmik/project/malgo/./malgo/svd.h:43:63: error: expected primary-expression before ‘>’ token
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                                                ^
 /home/mirmik/project/malgo/./malgo/svd.h:43:66: error: ‘x’ was not declared in this scope
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                                                   ^
 /home/mirmik/project/malgo/./malgo/svd.h:43:79: error: expected primary-expression before ‘thresh’
-  void SVD<M>::solve(const_vector_root_t<M> &b, vector_root_t<M> &x, type_t<M> thresh -1.)
+  void SVD<M>::solve(const_vroot_t<M> &b, vroot_t<M> &x, type_t<M> thresh -1.)
                                                                                ^~~~~~
 /home/mirmik/project/malgo/./malgo/svd.h:69:21: error: variable or field ‘solve’ declared void
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                      ^~~~~~~~~~~~~~~~~~~
-/home/mirmik/project/malgo/./malgo/svd.h:69:21: error: ‘const_matrix_root_t’ was not declared in this scope
-/home/mirmik/project/malgo/./malgo/svd.h:69:21: note: suggested alternative: ‘const_matrix_root’
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+/home/mirmik/project/malgo/./malgo/svd.h:69:21: error: ‘const_mroot_t’ was not declared in this scope
+/home/mirmik/project/malgo/./malgo/svd.h:69:21: note: suggested alternative: ‘const_mroot’
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                      ^~~~~~~~~~~~~~~~~~~
-                     const_matrix_root
+                     const_mroot
 /home/mirmik/project/malgo/./malgo/svd.h:69:42: error: expected primary-expression before ‘>’ token
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                           ^
 /home/mirmik/project/malgo/./malgo/svd.h:69:45: error: ‘b’ was not declared in this scope
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                              ^
-/home/mirmik/project/malgo/./malgo/svd.h:69:48: error: ‘matrix_root_t’ was not declared in this scope
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+/home/mirmik/project/malgo/./malgo/svd.h:69:48: error: ‘mroot_t’ was not declared in this scope
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                                 ^~~~~~~~~~~~~
-/home/mirmik/project/malgo/./malgo/svd.h:69:48: note: suggested alternative: ‘matrix_root’
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+/home/mirmik/project/malgo/./malgo/svd.h:69:48: note: suggested alternative: ‘mroot’
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                                 ^~~~~~~~~~~~~
-                                                matrix_root
+                                                mroot
 /home/mirmik/project/malgo/./malgo/svd.h:69:63: error: expected primary-expression before ‘>’ token
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                                                ^
 /home/mirmik/project/malgo/./malgo/svd.h:69:66: error: ‘x’ was not declared in this scope
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                                                   ^
 /home/mirmik/project/malgo/./malgo/svd.h:69:79: error: expected primary-expression before ‘tresh’
-  void SVD<M>::solve(const_matrix_root_t<M> &b, matrix_root_t<M> &x, type_t<M> tresh = -1.)
+  void SVD<M>::solve(const_mroot_t<M> &b, mroot_t<M> &x, type_t<M> tresh = -1.)
                                                                                ^~~~~
 /home/mirmik/project/malgo/./malgo/svd.h:84:6: error: redeclaration of ‘int malgo::SVD<M>::rank(malgo::type_t<M>)’ may not have default arguments [-fpermissive]
   int SVD<M>::rank(type_t<M> thresh = -1.)

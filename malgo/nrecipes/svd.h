@@ -14,7 +14,7 @@ namespace malgo
 		vector_t<M> w;
 		type_t<M> eps, tsh;
 		
-		SVD(matrix_root<M> &a) : m(a.size1()), n(a.size2()), u(a), v(n, n), w(n)
+		SVD(mroot<M> &a) : m(a.size1()), n(a.size2()), u(a), v(n, n), w(n)
 		{
 			eps = std::numeric_limits<type_t<M>>::epsilon();
 			decompose();
@@ -22,8 +22,8 @@ namespace malgo
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
 
-		void solve(const vector_root<M> &b, vector_root<M> &x, type_t<M> thresh = -1.);
-		void solve(const matrix_root<M> &b, matrix_root<M> &x, type_t<M> thresh = -1.);
+		void solve(const vroot<M> &b, vroot<M> &x, type_t<M> thresh = -1.);
+		void solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh = -1.);
 
 		int 			rank(type_t<M> thresh = -1.);
 		int 			nullity(type_t<M> thresh = -1.);
@@ -41,7 +41,7 @@ namespace malgo
 	};
 
 	template<class M>
-	void SVD<M>::solve(const vector_root<M> &b, vector_root<M> &x, type_t<M> thresh)
+	void SVD<M>::solve(const vroot<M> &b, vroot<M> &x, type_t<M> thresh)
 	{
 		int i, j, jj;
 		type_t<M> s;
@@ -67,7 +67,7 @@ namespace malgo
 	}
 
 	template <typename M>
-	void SVD<M>::solve(const matrix_root<M> &b, matrix_root<M> &x, type_t<M> thresh)
+	void SVD<M>::solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh)
 	{
 		int i, j, p = b.ncols();
 		if (b.nrows() != m || x.nrows() != n || x.ncols() != p)

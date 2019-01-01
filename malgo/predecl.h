@@ -3,8 +3,8 @@
 
 namespace malgo
 {
-	template<class M> struct matrix_root;
-	template<class V> struct vector_root;
+	template<class M> struct mroot;
+	template<class V> struct vroot;
 	template<class T, class A> struct matrix;
 }
 

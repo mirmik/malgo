@@ -55,7 +55,7 @@ namespace malgo
 	/// @param q - частное
 	/// @param r - остаток
 	template <class U, class V, class Q, class R>
-	void poldiv(const vector_root<U> &u, const vector_root<V> &v, vector_root<Q> &q, vector_root<R> &r)
+	void poldiv(const vroot<U> &u, const vroot<V> &v, vroot<Q> &q, vroot<R> &r)
 	{
 		int k; 
 		int j;

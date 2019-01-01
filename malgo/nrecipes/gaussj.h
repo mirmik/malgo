@@ -6,7 +6,7 @@
 namespace malgo
 {
 	template <typename A, typename B>
-	int gaussj(matrix_root<A>& a, matrix_root<B>& b)
+	int gaussj(mroot<A>& a, mroot<B>& b)
 	{
 		int 				i, icol, irow, j, k, l, ll, n = a.size1(), m = b.size2();
 		type_t<A> 			big, dum, pivinv;
@@ -67,7 +67,7 @@ namespace malgo
 	}
 
 	template<typename V>
-	int gaussj(matrix_root<V>& a)
+	int gaussj(mroot<V>& a)
 	{
 		matrix_t<V> b(a.size1(), a.size1());
 		return gaussj(a, b);

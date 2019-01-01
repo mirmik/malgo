@@ -4,6 +4,9 @@
 #include <limits>
 #include <malgo/matrix.h>
 
+
+//Attention Row Order.
+
 namespace malgo
 {
 	template <typename M>

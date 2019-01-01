@@ -13,7 +13,7 @@ namespace malgo
 		matrix_t<M> u, v;
 		vector_t<M> w;
 		type_t<M> eps, tsh;
-		
+
 		SVD(mroot<M> &a) : m(a.size1()), n(a.size2()), u(a), v(n, n), w(n)
 		{
 			eps = std::numeric_limits<type_t<M>>::epsilon();
@@ -40,8 +40,8 @@ namespace malgo
 		type_t<M> pythag(const type_t<M> a, const type_t<M> b);
 	};
 
-	template<class M> 
-	template<class A, class B> 
+	template<class M>
+	template<class A, class B>
 	void SVD<M>::solve(const vroot<A> &b, vroot<B> &x, type_t<M> thresh)
 	{
 		int i, j, jj;

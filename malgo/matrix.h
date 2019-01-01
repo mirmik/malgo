@@ -4,6 +4,7 @@
 #include <malgo/util.h>
 #include <malgo/vector.h>
 #include <malgo/algo/multiply.h>
+#include <malgo/algo/inverse.h>
 #include <malgo/raw/basealgo.h>
 
 #include <nos/trace.h>

@@ -1,4 +1,0 @@
-#ifndef MALGO_ELEMENTWISE_H
-#define MALGO_ELEMENTWISE_H
-
-#endif

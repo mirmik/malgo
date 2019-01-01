@@ -16,7 +16,6 @@ namespace malgo
 
 #include <malgo/vector.h>
 #include <malgo/matrix.h>
-#include <malgo/algo/elementwise.h>
 
 #include <assert.h>
 

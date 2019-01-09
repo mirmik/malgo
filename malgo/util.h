@@ -2,6 +2,8 @@
 #define MALGO_UTILCLASSES_H
 
 #include <cmath>
+#include <utility>
+
 #include <malgo/predecl.h>
 
 namespace malgo

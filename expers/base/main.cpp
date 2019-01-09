@@ -1,32 +1,23 @@
-#include <malgo/vector.h>
-#include <malgo/matrix.h>
-#include <malgo/nrecipes/gaussj.h>
-
+#include <malgo/phasestate.h>
 #include <nos/print.h>
-
-#include <malgo/echelon.h>
-#include <malgo/algo/pseudosqr.h>
-#include <malgo/algo/svd.h>
-
-#include <malgo/nrecipes/svd.h>
 
 int main()
 {
-	//auto m = malgo::matrix<double>{{1,1,2,1},{1,1,1,1},{1,1,1,1}};
-	auto m = malgo::matrix<double>{{0,0,0},{0,1,0},{0,0,0},{0,0,0}};
-	auto b = malgo::vector<double>{0,1,1,1};
-	auto x = malgo::vector<double>(3);
+//A = np.mat('''	0 1;
+//				-1 -1''') # собственная матрица
+//B = np.mat('''	0;
+//				-1''') # входная матрица
+//C = np.mat('''  1 0''') # выходная матрица
+//D = np.mat('''0''') # проходная матрица
+//x0 = np.mat("0; 0") # начальное состояние
 
-	malgo::SVD<decltype(m)> svd(m);
 
-	PRINT(svd.u);
-	PRINT(svd.v);
-	PRINT(svd.w);
+	malgo::matrix<double> A {{0,-1},{1,-1}};
+	malgo::matrix<double> B {{0,-1}};
+	malgo::matrix<double> C {{1},{0}};
+	malgo::matrix<double> D {{0}};
 
-	svd.solve(b,x);
-	PRINT(b);
-	PRINT(x);
+	malgo::transfer_function<double> W(A,B,C,D,0.004);
 
-	PRINT(svd.rank());
-
+	nos::println(W);
 }

@@ -202,8 +202,12 @@ namespace malgo
 	};
 
 	template<class F, class A, class B> using mxm_apply_t = matrix<ret_t<F, type_t<A>, type_t<B>>, alloc_t<A>>;
+	template<class F, class A, class B> using sxm_apply_t = matrix<ret_t<F, A, type_t<B>>, alloc_t<A>>;
+	template<class F, class A, class B> using mxs_apply_t = matrix<ret_t<F, type_t<A>, B>, alloc_t<A>>;
 	template<class F, class A, class B> mxm_apply_t<F,A,B> elementwise(F&& f, const mroot<A>& a, const mroot<B>& b) { mxm_apply_t<F,A,B> res(a.size1(), b.size2()); for (int i = 0; i < a.size(); ++i) res.elem(i) = f(a.elem(i), b.elem(i)); return res; }
-	
+	template<class F, class A, class B> sxm_apply_t<F,A,B> sxm_elementwise(F&& f, const A& a, const mroot<B>& b) 	{ sxm_apply_t<F,A,B> res(b.size1(), b.size2()); for (int i = 0; i < b.size(); ++i) res.elem(i) = f(a, 	 b.elem(i)); 	return res; }
+	template<class F, class A, class B> mxs_apply_t<F,A,B> mxs_elementwise(F&& f, const mroot<A>& a, const B& b) 	{ mxs_apply_t<F,A,B> res(a.size1(), a.size2()); for (int i = 0; i < a.size(); ++i) res.elem(i) = f(a.elem(i), 	 b); 	return res; }
+
 	//Lexicographic compare
 	template<class A, class B> int compare(const mroot<A>& a, const mroot<B>& b) 	{ if (a.size() != b.size()) return a.size() - b.size(); auto ait = a.begin(); auto bit = b.begin(); auto aend = a.end(); while (ait != aend) { auto r = *ait++ - *bit++; if (r != 0) return r; } return 0; }
 	template<class A, class B> bool operator == (const mroot<A>& a, const mroot<B>& b) { return compare(a, b) == 0; }
@@ -216,6 +220,7 @@ namespace malgo
 	//Algebraic
 	template<class A, class B> mxm_apply_t<detail::op_add,A,B> operator + (const mroot<A>& a, const mroot<B>& b) { return elementwise(detail::op_add{}, a, b); }
 	template<class A, class B> mxm_apply_t<detail::op_sub,A,B> operator - (const mroot<A>& a, const mroot<B>& b) { return elementwise(detail::op_sub{}, a, b); }
+	template<class A, class B> mxs_apply_t<detail::op_mul,A,B> operator * (const mroot<A>& a, B b) { return mxs_elementwise(detail::op_mul{}, a, b); }
 	//template<class A, class B> mxm_apply_t<detail::op_mul,A,B> operator * (const mroot<A>& a, const mroot<B>& b) { return elementwise(detail::op_mul{}, a, b); }
 	//template<class A, class B> mxm_apply_t<detail::op_div,A,B> operator / (const mroot<A>& a, const mroot<B>& b) { return elementwise(detail::op_div{}, a, b); }
 
@@ -225,6 +230,8 @@ namespace malgo
 	template<class M> matrix_t<M> exponent(const compact_matrix<M>& a) 	{ assert(a.size1() == a.size2()); matrix_t<M> res(a.size1(), a.size1()); malgo::raw::square_matrix_exponent(a.data(), a.size1(), res.data()); return res; } 
 
 	template<class T, class A = std::allocator<T>> matrix<T,A> diag(const std::initializer_list<T>& lst) { matrix<T,A> ret(lst.size(), lst.size()); const auto* data = lst.begin(); for (int i = 0; i < lst.size(); ++i) ret(i,i) = data[i]; return ret; } 
+
+	template<class T> matrix<T> identity(int num) { matrix<T> ret(num,num); for (int i = 0; i < num; ++i) for (int j = 0; j < num; ++j) ret(i,j) = i==j ? 1 : 0; return ret; }
 }
 
 

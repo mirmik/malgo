@@ -157,8 +157,8 @@ namespace malgo
 	template<class F, class A, class B> using sxv_apply_t = vector<ret_t<F, A, type_t<B>>, alloc_t<A>>;
 	template<class F, class A, class B> using vxs_apply_t = vector<ret_t<F, type_t<A>, B>, alloc_t<A>>;
 	template<class F, class A, class B> vxv_apply_t<F,A,B> elementwise(F&& f, const vroot<A>& a, const vroot<B>& b) 	{ vxv_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b[i]); 	return res; }
-	template<class F, class A, class B> sxv_apply_t<F,A,B> sxv_elementwise(F&& f, const A& a, const vroot<B>& b) 				{ sxv_apply_t<F,A,B> res(b.size()); for (int i = 0; i < b.size(); ++i) res[i] = f(a, 	 b[i]); return res; }
-	template<class F, class A, class B> vxs_apply_t<F,A,B> vxs_elementwise(F&& f, const vroot<A>& a, const B& b) 				{ vxs_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b); 	return res; }
+	template<class F, class A, class B> sxv_apply_t<F,A,B> sxv_elementwise(F&& f, const A& a, const vroot<B>& b) 		{ sxv_apply_t<F,A,B> res(b.size()); for (int i = 0; i < b.size(); ++i) res[i] = f(a, 	 b[i]); return res; }
+	template<class F, class A, class B> vxs_apply_t<F,A,B> vxs_elementwise(F&& f, const vroot<A>& a, const B& b) 		{ vxs_apply_t<F,A,B> res(a.size()); for (int i = 0; i < a.size(); ++i) res[i] = f(a[i], b); 	return res; }
 
 	//template<class F, class A, class B> A& self_elementwise(F&& f, vroot<A>& a, const vroot<B>& b) 	{ for (int i = 0; i < a.size(); ++i) a[i] = f(a[i], b[i]); 	return res; }
 	
@@ -176,9 +176,11 @@ namespace malgo
 	template<class V, class W> vxv_apply_t<detail::op_add,V,W> operator + (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_add{}, a, b); }
 	template<class V, class W> vxv_apply_t<detail::op_sub,V,W> operator - (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_sub{}, a, b); }
 	template<class V, class W> vxv_apply_t<detail::op_mul,V,W> operator * (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_mul{}, a, b); }
-	template<class V, class W> sxv_apply_t<detail::op_mul,V,W> operator * (const V& a, const vroot<W>& b) { return svx_elementwise(detail::op_mul{}, a, b); }
-	template<class V, class W> vxs_apply_t<detail::op_mul,V,W> operator * (const vroot<V>& a, const W& b) { return vxs_elementwise(detail::op_mul{}, a, b); }
+	template<class V, class W> sxv_apply_t<detail::op_mul,V,W> operator * (const V& a, const vroot<W>& b) { return sxv_elementwise(detail::op_mul{}, a, b); }
 	template<class V, class W> vxv_apply_t<detail::op_div,V,W> operator / (const vroot<V>& a, const vroot<W>& b) { return elementwise(detail::op_div{}, a, b); }
+
+	template<class V, class S> vxs_apply_t<detail::op_mul,V,S> operator * (const vroot<V>& a, S b) { return vxs_elementwise(detail::op_mul{}, a, b); }
+	template<class V, class S> vxs_apply_t<detail::op_div,V,S> operator / (const vroot<V>& a, S b) { return vxs_elementwise(detail::op_div{}, a, b); }
 
 	//template<class V, class W> V& operator += (vroot& self, const vroot<W>& b) { return self_elementwise(detail::op_sum{}, a, b); }
 
@@ -193,6 +195,19 @@ namespace malgo
 	template<class V, class W> typename traits<V>::type dot(const vroot<V>& a, const vroot<W>& b) 	{ return sum(a * b); }
 	template<class V> typename traits<V>::type 			length2(const vroot<V> & a) 						{ return dot(a, a); }
 	template<class V> typename traits<V>::type 			length(const vroot<V> & a) 						{ return std::sqrt(length2(a)); }
+
+    template<class V> 
+    vector_t<V> normalize(const vroot<V>& a) 
+    { 
+    	return a / length(a); 
+    }
+
+    template<class V> 
+    void self_normalize(vroot<V>& a) 
+    { 
+    	auto l = length(a);
+    	for (auto& r : a) r /= l;  
+    }
 }
 
 template<class C, class V> std::basic_ostream<C> &

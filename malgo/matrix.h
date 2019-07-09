@@ -182,7 +182,7 @@ namespace malgo
 			keeper::create(oth.size(), N); 
 			T* ptr = parent::data();
 
-			for (int i = 0; i < oth.size(); ++i) 
+			for (unsigned int i = 0; i < oth.size(); ++i) 
 				for (int j = 0; j < N; ++j)
 					*ptr++ = oth[i][j];
 

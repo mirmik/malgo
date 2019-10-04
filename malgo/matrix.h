@@ -9,7 +9,7 @@
 
 #include <nos/trace.h>
 
-#include <linalg.h>
+#include <linalg/linalg.h>
 
 namespace malgo
 {

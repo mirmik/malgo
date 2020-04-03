@@ -217,6 +217,7 @@ operator << (std::basic_ostream<C> & out, const malgo::vroot<V> & v)
 	for (int i = 0; i < v.size() - 1; ++i)
 		out << v[i] << ',';
 	out << v[v.size() - 1] << '}';
+	return out;
 }
 
 #endif

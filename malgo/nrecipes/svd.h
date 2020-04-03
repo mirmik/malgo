@@ -21,6 +21,7 @@ namespace malgo
 		{
 			eps = std::numeric_limits<type_t<M>>::epsilon();
 			decompose();
+			nos::print_matrix(u);
 			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}

@@ -3,7 +3,7 @@
 
 #include <malgo/util.h>
 #include <nos/trace.h>
-#include <nos/dprint.h>
+#include <igris/dprint.h>
 #include <nos/print.h>
 
 namespace malgo
